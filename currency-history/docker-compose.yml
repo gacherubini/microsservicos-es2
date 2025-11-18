@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  currency-history:
+    build: .
+    container_name: currency-history
+    ports:
+      - "8101:8080"
+    networks:
+      - shared-net
+
+networks:
+  shared-net:
+    external: true
+    name: currency-net

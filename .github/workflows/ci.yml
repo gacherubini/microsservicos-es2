@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clona o repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configura Java 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      # 3. Build do currency-report
+      - name: Build currency-report
+        working-directory: ./currency-report
+        run: mvn -q -DskipTests package
+
+      # 4. Testes simples do currency-report
+      - name: Test currency-report
+        working-directory: ./currency-report
+        run: mvn test
+
+      # 5. Build do currency-history
+      - name: Build currency-history
+        working-directory: ./currency-history
+        run: mvn -q -DskipTests package
+
+      # 6. Testes simples do currency-history
+      - name: Test currency-history
+        working-directory: ./currency-history
+        run: mvn test
+
+      # 7. Configurar Docker Buildx (mais rápido)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 8. Docker build currency-report
+      - name: Docker build currency-report
+        run: docker build -t currency-report:ci ./currency-report
+
+      # 9. Docker build currency-history
+      - name: Docker build currency-history
+        run: docker build -t currency-history:ci ./currency-history

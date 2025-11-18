@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  currency-report:
+    build: .
+    container_name: currency-report
+    ports:
+      - "8100:8080"
+    networks:
+      - shared-net
+
+networks:
+  shared-net:
+    external: true
+    name: currency-net
